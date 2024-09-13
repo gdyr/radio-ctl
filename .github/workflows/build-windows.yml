@@ -6,92 +6,42 @@ on:
       - 'v*'
 
 jobs:
-  build-x86_64:
+  build-and-publish:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-pc-windows-msvc
+          - aarch64-pc-windows-msvc
+        arch:
+          - x86_64
+          - arm
+        include:
+          - target: x86_64-pc-windows-msvc
+            arch: x86_64
+          - target: aarch64-pc-windows-msvc
+            arch: arm
 
     steps:
-      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Rust for x86_64
-      - name: Set up Rust for x86_64
+      - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: x86_64-pc-windows-msvc
+          target: ${{ matrix.target }}
 
-      # Step 3: Build the project for x86_64
-      - name: Build x86_64
+      - name: Build
         run: cargo build --release
 
-      # Step 4: Upload the x86_64 artifact
-      - name: Upload x86_64 artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: radio-ctl-x86_64.exe
-          path: target/release/radio-ctl.exe
+      - name: Rename .exe file
+        run: |
+          ren target\release\radio-ctl.exe radio-ctl-${{ matrix.arch }}.exe
 
-  build-arm:
-    runs-on: windows-latest
-
-    steps:
-      # Step 1: Checkout the code
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Step 2: Set up Rust for ARM
-      - name: Set up Rust for ARM
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: aarch64-pc-windows-msvc
-
-      # Step 3: Build the project for ARM
-      - name: Build ARM
-        run: cargo build --release
-
-      # Step 4: Upload the ARM artifact
-      - name: Upload ARM artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: radio-ctl-arm.exe
-          path: target/release/radio-ctl.exe
-
-  publish:
-    runs-on: windows-latest
-    needs: [build-x86_64, build-arm]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Download the x86_64 artifact
-      - name: Download x86_64 artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: radio-ctl-x86_64.exe
-          path: target/release/
-
-      # Download the ARM artifact
-      - name: Download ARM artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: radio-ctl-arm.exe
-          path: target/release/
-
-      # Upload x86_64 Binary to GitHub Releases
-      - name: Upload x86_64 Binary to GitHub Releases
+      - name: Upload Binary to GitHub Releases
         uses: softprops/action-gh-release@v1
         with:
-          files: target/release/radio-ctl-x86_64.exe
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Upload ARM Binary to GitHub Releases
-      - name: Upload ARM Binary to GitHub Releases
-        uses: softprops/action-gh-release@v1
-        with:
-          files: target/release/radio-ctl-arm.exe
+          files: target/release/radio-ctl-${{ matrix.arch }}.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
