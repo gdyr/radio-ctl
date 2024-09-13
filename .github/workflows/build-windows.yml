@@ -2,9 +2,8 @@ name: Build and Publish .exe
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
+    tags:
+      - 'v*'
 
 jobs:
   build-x86_64:
