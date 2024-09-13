@@ -10,38 +10,39 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        target:
-          - x86_64-pc-windows-msvc
-          - aarch64-pc-windows-msvc
-        arch:
-          - x86_64
-          - arm
         include:
           - target: x86_64-pc-windows-msvc
             arch: x86_64
+            exe_name: radio-ctl-x86_64.exe
           - target: aarch64-pc-windows-msvc
             arch: arm
+            exe_name: radio-ctl-arm.exe
 
     steps:
+      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step 2: Set up Rust toolchain for the target
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: ${{ matrix.target }}
 
+      # Step 3: Build the project for the respective architecture
       - name: Build
         run: cargo build --release
 
+      # Step 4: Rename the .exe file to avoid clashes
       - name: Rename .exe file
         run: |
-          ren target\release\radio-ctl.exe radio-ctl-${{ matrix.arch }}.exe
+          ren target\release\radio-ctl.exe ${{ matrix.exe_name }}
 
+      # Step 5: Upload the Binary to GitHub Releases
       - name: Upload Binary to GitHub Releases
         uses: softprops/action-gh-release@v1
         with:
-          files: target/release/radio-ctl-${{ matrix.arch }}.exe
+          files: target/release/${{ matrix.exe_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
