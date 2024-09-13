@@ -66,6 +66,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Download the x86_64 artifact
+      - name: Download x86_64 artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: radio-ctl-x86_64.exe
+          path: target/release/
+
+      # Download the ARM artifact
+      - name: Download ARM artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: radio-ctl-arm.exe
+          path: target/release/
+
+      # Upload x86_64 Binary to GitHub Releases
       - name: Upload x86_64 Binary to GitHub Releases
         uses: softprops/action-gh-release@v1
         with:
@@ -73,6 +88,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Upload ARM Binary to GitHub Releases
       - name: Upload ARM Binary to GitHub Releases
         uses: softprops/action-gh-release@v1
         with:
