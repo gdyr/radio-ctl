@@ -6,6 +6,7 @@ use windows::Devices::Radios::RadioKind;
   version,
   about = "A command-line tool to manage radios such as WiFi, Bluetooth, etc.",
   long_about = None,
+  allow_hyphen_values = true,
   after_help = "EXAMPLES:\n\
                 radio-ctl list\n\
                 radio-ctl on --kind=bluetooth\n\
@@ -16,11 +17,14 @@ pub struct Args {
     #[command(subcommand)]
     pub subcommand: Option<Command>,
 
-    #[arg(long, help = "Specify the radio type", value_enum)]
+    #[arg(long, global = true, help = "Specify the radio type", value_enum)]
     pub kind: Option<Kind>,
 
-    #[arg(long, help = "Specify the device name")]
+    #[arg(long, global = true, help = "Specify the device name")]
     pub name: Option<String>,
+
+    #[arg(long, global = true, help = "Disable colored output & unicode symbols")]
+    pub plain: bool,
 
 }
 

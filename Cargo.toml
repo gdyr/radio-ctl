@@ -8,4 +8,6 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.88"
 clap = { version = "4.5.17", features = ["derive"] }
+colored = "2.1.0"
+unicode-segmentation = "1.11.0"
 windows = { version = "0.58.0", features = ["Foundation_Collections", "Devices_Radios"] }

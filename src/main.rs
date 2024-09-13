@@ -6,7 +6,6 @@ use clap::Parser;
 fn main() {
 
     let args = cli::Args::parse();
-    println!("{:?}", args);
 
     let radios = radio::get_radios().expect("Failed to enumerate radios");
 
@@ -26,7 +25,11 @@ fn main() {
 
         match args.command() {
             cli::Command::List => {
-                println!("{}", radio::describe_radio(&radio));
+                if args.plain {
+                    println!("{}", radio::describe_radio_plain(&radio));
+                } else {
+                    println!("{}", radio::describe_radio(&radio));
+                }
             },
             cli::Command::On => {
                 radio::turn_on_radio(&radio).expect("Failed to turn on radio");
