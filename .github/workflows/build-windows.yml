@@ -61,7 +61,6 @@ jobs:
   publish:
     runs-on: windows-latest
     needs: [build-x86_64, build-arm]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
